@@ -1,5 +1,7 @@
 services:
   web:
+    container_name: natalgf
+    image: natalgf:latest
     build: .
     command: npm run dev
     ports:
