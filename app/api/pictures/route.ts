@@ -33,7 +33,7 @@ export async function GET(request: Request) {
   let result;
   if (gachaId) {
     result = await query(
-      "SELECT id, original_name, created_at, gacha_id FROM pictures WHERE gacha_id = $1 ORDER BY created_at DESC LIMIT 100",
+      "SELECT id, original_name, created_at, gacha_id FROM pictures WHERE gacha_id = $1 ORDER BY created_at DESC",
       [Number(gachaId)],
     );
   } else if (gachaOnly) {
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
     );
   } else {
     result = await query(
-      "SELECT id, original_name, created_at, gacha_id FROM pictures ORDER BY created_at DESC LIMIT 200",
+      "SELECT id, original_name, created_at, gacha_id FROM pictures ORDER BY created_at DESC",
     );
   }
 
