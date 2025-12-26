@@ -122,7 +122,7 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
     const fetchUploads = async () => {
       try {
         console.debug("[gacha] fetch /api/pictures start");
-        const res = await fetch(withPublicToken("/api/pictures"), {
+        const res = await fetch(withPublicToken("/api/pictures?gachaOnly=1"), {
           headers: getPublicHeaders(),
         });
         console.debug("[gacha] fetch /api/pictures status", res.status);

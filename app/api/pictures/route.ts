@@ -28,12 +28,17 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const gachaId = url.searchParams.get("gachaId");
+  const gachaOnly = url.searchParams.get("gachaOnly") === "1";
 
   let result;
   if (gachaId) {
     result = await query(
       "SELECT id, original_name, created_at, gacha_id FROM pictures WHERE gacha_id = $1 ORDER BY created_at DESC LIMIT 100",
       [Number(gachaId)],
+    );
+  } else if (gachaOnly) {
+    result = await query(
+      "SELECT id, original_name, created_at, gacha_id FROM pictures WHERE gacha_id IS NOT NULL ORDER BY created_at DESC",
     );
   } else {
     result = await query(
