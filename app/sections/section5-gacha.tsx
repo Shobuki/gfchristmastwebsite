@@ -81,7 +81,7 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
   }, [items, uploadsById]);
 
   const saveCollected = (itemId: number) => {
-    void fetch(withPublicToken("/api/gacha-results"), {
+    return fetch(withPublicToken("/api/gacha-results"), {
       method: "POST",
       headers: {
         ...getPublicHeaders(),
@@ -89,6 +89,27 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
       },
       body: JSON.stringify({ gachaItemId: itemId }),
     });
+  };
+
+  const fetchCollected = async () => {
+    try {
+      console.debug("[gacha] fetch /api/gacha-results start");
+      const res = await fetch(withPublicToken("/api/gacha-results"), {
+        headers: getPublicHeaders(),
+      });
+      console.debug("[gacha] fetch /api/gacha-results status", res.status);
+      const data = await res.json();
+      if (Array.isArray(data?.items)) {
+        const ids = data.items
+          .map((id: unknown) => Number(id))
+          .filter((id: number) => Number.isFinite(id));
+        console.debug("[gacha] /api/gacha-results items", ids.length);
+        setCollected(new Set(ids));
+      }
+    } catch {
+      // ignore
+      console.debug("[gacha] fetch /api/gacha-results failed");
+    }
   };
 
   const poolByRarity = useMemo(() => {
@@ -174,27 +195,7 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
   }, []);
 
   useEffect(() => {
-    const fetchCollected = async () => {
-      try {
-        console.debug("[gacha] fetch /api/gacha-results start");
-        const res = await fetch(withPublicToken("/api/gacha-results"), {
-          headers: getPublicHeaders(),
-        });
-        console.debug("[gacha] fetch /api/gacha-results status", res.status);
-        const data = await res.json();
-        if (Array.isArray(data?.items)) {
-          const ids = data.items
-            .map((id: unknown) => Number(id))
-            .filter((id: number) => Number.isFinite(id));
-          console.debug("[gacha] /api/gacha-results items", ids.length);
-          setCollected(new Set(ids));
-        }
-      } catch {
-        // ignore
-        console.debug("[gacha] fetch /api/gacha-results failed");
-      }
-    };
-    fetchCollected();
+    void fetchCollected();
   }, []);
 
   useEffect(() => {
@@ -310,7 +311,7 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
     const item = pool[Math.floor(Math.random() * pool.length)];
     setModalItem(item);
     if (!collected.has(item.id)) {
-      saveCollected(item.id);
+      void saveCollected(item.id).then(() => fetchCollected());
     }
     setCollected((prev) => {
       const next = new Set(prev);
