@@ -1,0 +1,3 @@
+ALTER TABLE love_radar_logs
+ADD COLUMN IF NOT EXISTS target_point POINT,
+ADD COLUMN IF NOT EXISTS user_point POINT;

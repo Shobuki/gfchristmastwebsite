@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS love_radar_logs (
+  id SERIAL PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  target_lat DOUBLE PRECISION NOT NULL,
+  target_lng DOUBLE PRECISION NOT NULL,
+  user_lat DOUBLE PRECISION,
+  user_lng DOUBLE PRECISION,
+  distance_m DOUBLE PRECISION,
+  distance_km DOUBLE PRECISION,
+  accuracy_m DOUBLE PRECISION,
+  status TEXT NOT NULL,
+  error_message TEXT
+);

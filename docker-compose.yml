@@ -1,0 +1,16 @@
+services:
+  web:
+    build: .
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - STORAGE_DIR=/data/natalgf/images
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./data/images:/data/natalgf/images

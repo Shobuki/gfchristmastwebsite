@@ -1,0 +1,40 @@
+param(
+  [string]$ImageName = "natalgf",
+  [string]$ImageTag = "latest",
+  [string]$SshHost = "82.153.226.199",
+  [string]$SshUser,
+  [int]$SshPort = 22,
+  [string]$DeployPath = "/root/natalgf",
+  [string]$SshKey = ""
+)
+
+if (-not $SshUser) {
+  Write-Error "SSH_USER is required"
+  exit 1
+}
+
+if (-not (Get-Command ssh -ErrorAction SilentlyContinue)) {
+  Write-Error "ssh command not found. Install OpenSSH Client first."
+  exit 1
+}
+
+$image = "$ImageName`:$ImageTag"
+
+Write-Host "Building image $image..."
+docker build -t $image .
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+$sshArgs = @("-p", $SshPort.ToString())
+if ($SshKey) { $sshArgs += @("-i", $SshKey) }
+$sshArgs += "$SshUser@$SshHost"
+
+Write-Host "Sending image to $SshHost..."
+docker save $image | ssh @sshArgs "docker load"
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+$remoteCmd = "cd $DeployPath && docker compose up -d --build && docker compose exec -T web npm run migrate"
+Write-Host "Deploying on remote..."
+ssh @sshArgs $remoteCmd
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+Write-Host "Deploy complete."
