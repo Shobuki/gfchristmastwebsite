@@ -124,8 +124,14 @@ export default function AdminPage() {
 
   const fetchPictures = async () => {
     try {
+      console.debug("[admin][gacha] fetch /api/pictures start");
       const res = await authFetch("/api/pictures");
+      console.debug("[admin][gacha] fetch /api/pictures status", res.status);
       const data = await res.json();
+      console.debug(
+        "[admin][gacha] /api/pictures items",
+        Array.isArray(data.items) ? data.items.length : 0,
+      );
       setPictures(data.items || []);
     } finally {
       setLoading(false);
@@ -139,8 +145,14 @@ export default function AdminPage() {
   };
 
   const fetchGachaItems = async () => {
+    console.debug("[admin][gacha] fetch /api/gacha-items start");
     const res = await authFetch("/api/gacha-items");
+    console.debug("[admin][gacha] fetch /api/gacha-items status", res.status);
     const data = await res.json();
+    console.debug(
+      "[admin][gacha] /api/gacha-items items",
+      Array.isArray(data.items) ? data.items.length : 0,
+    );
     setGachaItems(data.items || []);
   };
 
@@ -192,9 +204,12 @@ export default function AdminPage() {
   };
 
   const fetchRaritySettings = async () => {
+    console.debug("[admin][gacha] fetch /api/gacha-rarity start");
     const res = await authFetch("/api/gacha-rarity");
+    console.debug("[admin][gacha] fetch /api/gacha-rarity status", res.status);
     const data = await res.json();
     const items = (data.items || []) as RaritySetting[];
+    console.debug("[admin][gacha] /api/gacha-rarity items", items.length);
     items.sort(
       (a, b) => RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity),
     );

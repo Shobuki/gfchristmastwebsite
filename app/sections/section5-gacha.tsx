@@ -121,10 +121,16 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
   useEffect(() => {
     const fetchUploads = async () => {
       try {
+        console.debug("[gacha] fetch /api/pictures start");
         const res = await fetch(withPublicToken("/api/pictures"), {
           headers: getPublicHeaders(),
         });
+        console.debug("[gacha] fetch /api/pictures status", res.status);
         const data = await res.json();
+        console.debug(
+          "[gacha] /api/pictures items",
+          Array.isArray(data.items) ? data.items.length : 0,
+        );
         const latestMap: Record<number, string> = {};
         for (const item of data.items || []) {
           if (item.gachaId && !latestMap[item.gachaId]) {
@@ -134,6 +140,7 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
         setUploadsById(latestMap);
       } catch {
         // Ignore fetch errors and keep placeholders.
+        console.debug("[gacha] fetch /api/pictures failed");
       }
     };
     fetchUploads();
@@ -142,10 +149,16 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
   useEffect(() => {
     const fetchItems = async () => {
       try {
+        console.debug("[gacha] fetch /api/gacha-items start");
         const res = await fetch(withPublicToken("/api/gacha-items"), {
           headers: getPublicHeaders(),
         });
+        console.debug("[gacha] fetch /api/gacha-items status", res.status);
         const data = await res.json();
+        console.debug(
+          "[gacha] /api/gacha-items items",
+          Array.isArray(data.items) ? data.items.length : 0,
+        );
         const mapped =
           (data.items || []).map((item: GachaItem) => ({
             ...item,
@@ -154,6 +167,7 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
         setItems(mapped);
       } catch {
         // ignore
+        console.debug("[gacha] fetch /api/gacha-items failed");
       }
     };
     fetchItems();
@@ -162,18 +176,22 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
   useEffect(() => {
     const fetchCollected = async () => {
       try {
+        console.debug("[gacha] fetch /api/gacha-results start");
         const res = await fetch(withPublicToken("/api/gacha-results"), {
           headers: getPublicHeaders(),
         });
+        console.debug("[gacha] fetch /api/gacha-results status", res.status);
         const data = await res.json();
         if (Array.isArray(data?.items)) {
           const ids = data.items
             .map((id: unknown) => Number(id))
             .filter((id: number) => Number.isFinite(id));
+          console.debug("[gacha] /api/gacha-results items", ids.length);
           setCollected(new Set(ids));
         }
       } catch {
         // ignore
+        console.debug("[gacha] fetch /api/gacha-results failed");
       }
     };
     fetchCollected();
@@ -182,15 +200,18 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
   useEffect(() => {
     const fetchCoins = async () => {
       try {
+        console.debug("[gacha] fetch /api/gacha-state start");
         const res = await fetch(withPublicToken("/api/gacha-state"), {
           headers: getPublicHeaders(),
         });
+        console.debug("[gacha] fetch /api/gacha-state status", res.status);
         const data = await res.json();
         if (typeof data?.coins === "number") {
           setCoins(data.coins);
         }
       } catch {
         // ignore
+        console.debug("[gacha] fetch /api/gacha-state failed");
       } finally {
         coinsLoadedRef.current = true;
       }
@@ -220,15 +241,18 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
   useEffect(() => {
     const fetchLayout = async () => {
       try {
+        console.debug("[gacha] fetch /api/layout start");
         const res = await fetch(withPublicToken("/api/layout"), {
           headers: getPublicHeaders(),
         });
+        console.debug("[gacha] fetch /api/layout status", res.status);
         const data = await res.json();
         if (data?.item?.gacha_columns) {
           setLayout({ gachaColumns: data.item.gacha_columns });
         }
       } catch {
         // ignore
+        console.debug("[gacha] fetch /api/layout failed");
       }
     };
     fetchLayout();
@@ -237,9 +261,11 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
   useEffect(() => {
     const fetchRarity = async () => {
       try {
+        console.debug("[gacha] fetch /api/gacha-rarity start");
         const res = await fetch(withPublicToken("/api/gacha-rarity"), {
           headers: getPublicHeaders(),
         });
+        console.debug("[gacha] fetch /api/gacha-rarity status", res.status);
         const data = await res.json();
         const next = { ...rarityWeights };
         for (const row of data.items || []) {
@@ -250,6 +276,7 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
         setRarityWeights(next);
       } catch {
         // ignore
+        console.debug("[gacha] fetch /api/gacha-rarity failed");
       }
     };
     fetchRarity();
