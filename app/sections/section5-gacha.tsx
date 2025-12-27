@@ -52,6 +52,7 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
   const [coins, setCoins] = useState(5);
   const [tapCount, setTapCount] = useState(0);
   const [modalItem, setModalItem] = useState<GachaItem | null>(null);
+  const [fullScreenItem, setFullScreenItem] = useState<GachaItem | null>(null);
   const [collected, setCollected] = useState<Set<number>>(new Set());
   const [santaPos, setSantaPos] = useState({ x: 0, y: 0 });
   const [uploadsById, setUploadsById] = useState<Record<number, string>>({});
@@ -414,16 +415,31 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
                   gridTemplateColumns: `repeat(${layout.gachaColumns}, minmax(0, 1fr))`,
                 }}
               >
-                {items.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`h-10 rounded-xl border border-white/10 ${
-                      collected.has(item.id)
-                        ? "bg-white/20"
-                        : "bg-white/5 opacity-40"
-                    }`}
-                  />
-                ))}
+                {itemsWithUploads.map((item) => {
+                  const isCollected = collected.has(item.id);
+                  return (
+                    <button
+                      type="button"
+                      key={item.id}
+                      onClick={() =>
+                        isCollected ? setFullScreenItem(item) : null
+                      }
+                      className={`relative h-12 overflow-hidden rounded-xl border border-white/10 transition ${
+                        isCollected
+                          ? "bg-white/20"
+                          : "bg-white/5 opacity-40"
+                      }`}
+                    >
+                      {isCollected ? (
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : null}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -541,6 +557,31 @@ export default function Gacha({ onUnlockLetter }: GachaProps) {
               >
                 Lanjut
               </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {fullScreenItem && (
+          <motion.div
+            className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setFullScreenItem(null)}
+          >
+            <motion.div
+              className="w-full max-w-3xl overflow-hidden rounded-2xl bg-black/40"
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+            >
+              <img
+                src={fullScreenItem.image}
+                alt={fullScreenItem.title}
+                className="max-h-[80vh] w-full object-contain"
+              />
             </motion.div>
           </motion.div>
         )}
